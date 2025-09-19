@@ -1,0 +1,44 @@
+package com.tracking.entity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class TrackingResponse {
+	private List<DeviceTrackingInfo> devices = new ArrayList<>();
+	private int totalDevices;
+	private int onlineDevices;
+	private int offlineDevices;
+
+	// Getters and Setters
+	public List<DeviceTrackingInfo> getDevices() {
+		return devices;
+	}
+
+	public void setDevices(List<DeviceTrackingInfo> devices) {
+		this.devices = devices;
+	}
+
+	public int getTotalDevices() {
+		return totalDevices;
+	}
+
+	public void setTotalDevices(int totalDevices) {
+		this.totalDevices = totalDevices;
+	}
+
+	public int getOnlineDevices() {
+		return onlineDevices;
+	}
+
+	public void setOnlineDevices(int onlineDevices) {
+		this.onlineDevices = onlineDevices;
+	}
+
+	public int getOfflineDevices() {
+		return offlineDevices;
+	}
+
+	public void setOfflineDevices(int offlineDevices) {
+		this.offlineDevices = offlineDevices;
+	}
+}

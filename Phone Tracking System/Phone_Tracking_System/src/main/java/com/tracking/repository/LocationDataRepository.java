@@ -1,0 +1,38 @@
+package com.tracking.repository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.tracking.entity.LocationData;
+
+@Repository
+public interface LocationDataRepository extends JpaRepository<LocationData, Long> {
+
+	Optional<LocationData> findTopByDeviceIdOrderByTimestampDesc(Long deviceId);
+
+	List<LocationData> findByDeviceIdAndTimestampAfterOrderByTimestampDesc(Long deviceId, LocalDateTime after);
+
+	List<LocationData> findByDeviceIdOrderByTimestampDesc(Long deviceId);
+
+	Optional<LocationData> findByDeviceIdAndIsLastKnownTrue(Long deviceId);
+
+	@Modifying
+	@Transactional
+	@Query("UPDATE LocationData l SET l.isLastKnown = :status WHERE l.device.id = :deviceId")
+	void updateLastKnownStatus(@Param("deviceId") Long deviceId, @Param("status") Boolean status);
+
+	@Query("SELECT l FROM LocationData l WHERE l.device.id = :deviceId AND l.timestamp BETWEEN :startTime AND :endTime ORDER BY l.timestamp DESC")
+	List<LocationData> findLocationsBetweenDates(@Param("deviceId") Long deviceId,
+			@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
+
+	@Query("SELECT l FROM LocationData l WHERE l.device.id IN :deviceIds AND l.isLastKnown = true")
+	List<LocationData> findLastKnownLocationsByDeviceIds(@Param("deviceIds") List<Long> deviceIds);
+}

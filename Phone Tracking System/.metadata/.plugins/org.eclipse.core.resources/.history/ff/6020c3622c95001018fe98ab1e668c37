@@ -1,0 +1,50 @@
+package com.tracking.dto;
+
+public class DeviceTrackingInfo {
+	private Device device;
+	private LocationData currentLocation;
+	private boolean online;
+	private String lastSeenFormatted;
+	private Integer batteryLevel;
+
+	// Getters and Setters
+	public Device getDevice() {
+		return device;
+	}
+
+	public void setDevice(Device device) {
+		this.device = device;
+	}
+
+	public LocationData getCurrentLocation() {
+		return currentLocation;
+	}
+
+	public void setCurrentLocation(LocationData currentLocation) {
+		this.currentLocation = currentLocation;
+	}
+
+	public boolean isOnline() {
+		return online;
+	}
+
+	public void setOnline(boolean online) {
+		this.online = online;
+	}
+
+	public String getLastSeenFormatted() {
+		return lastSeenFormatted;
+	}
+
+	public void setLastSeenFormatted(String lastSeenFormatted) {
+		this.lastSeenFormatted = lastSeenFormatted;
+	}
+
+	public Integer getBatteryLevel() {
+		return batteryLevel;
+	}
+
+	public void setBatteryLevel(Integer batteryLevel) {
+		this.batteryLevel = batteryLevel;
+	}
+}

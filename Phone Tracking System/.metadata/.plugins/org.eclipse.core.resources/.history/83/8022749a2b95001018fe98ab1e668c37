@@ -1,0 +1,5 @@
+package com.tracking.dto;
+
+public class LocationUpdateRequest {
+
+}

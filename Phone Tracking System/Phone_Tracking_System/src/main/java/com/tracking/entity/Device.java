@@ -1,0 +1,126 @@
+package com.tracking.entity;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Entity
+@Table(name = "devices")
+public class Device {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@Column(name = "device_id", unique = true)
+	private String deviceId;
+
+	private String deviceName;
+	private String deviceModel;
+	private String osVersion;
+	private String appVersion;
+	private boolean isActive = true;
+
+	@Column(name = "last_seen")
+	private LocalDateTime lastSeen = LocalDateTime.now();
+
+	@Column(name = "created_at")
+	private LocalDateTime createdAt = LocalDateTime.now();
+
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	private User user;
+
+	@OneToMany(mappedBy = "device", cascade = CascadeType.ALL)
+	private List<LocationData> locationData;
+
+	// Constructors, getters, and setters
+	public Device() {
+	}
+
+	public Device(String deviceId, String deviceName, User user) {
+		this.deviceId = deviceId;
+		this.deviceName = deviceName;
+		this.user = user;
+	}
+
+	// Getters and Setters
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
+
+	public String getDeviceName() {
+		return deviceName;
+	}
+
+	public void setDeviceName(String deviceName) {
+		this.deviceName = deviceName;
+	}
+
+	public String getDeviceModel() {
+		return deviceModel;
+	}
+
+	public void setDeviceModel(String deviceModel) {
+		this.deviceModel = deviceModel;
+	}
+
+	public String getOsVersion() {
+		return osVersion;
+	}
+
+	public void setOsVersion(String osVersion) {
+		this.osVersion = osVersion;
+	}
+
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean active) {
+		isActive = active;
+	}
+
+	public LocalDateTime getLastSeen() {
+		return lastSeen;
+	}
+
+	public void setLastSeen(LocalDateTime lastSeen) {
+		this.lastSeen = lastSeen;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public List<LocationData> getLocationData() {
+		return locationData;
+	}
+
+	public void setLocationData(List<LocationData> locationData) {
+		this.locationData = locationData;
+	}
+}

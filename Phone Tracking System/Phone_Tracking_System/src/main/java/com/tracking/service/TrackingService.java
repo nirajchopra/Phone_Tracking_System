@@ -1,0 +1,141 @@
+package com.tracking.service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import com.tracking.dto.DeviceTrackingInfo;
+import com.tracking.dto.LocationUpdateRequest;
+import com.tracking.dto.TrackingResponse;
+import com.tracking.entity.Device;
+import com.tracking.entity.DeviceStatus;
+import com.tracking.entity.LocationData;
+import com.tracking.repository.DeviceRepository;
+import com.tracking.repository.DeviceStatusRepository;
+import com.tracking.repository.LocationDataRepository;
+
+@Service
+public class TrackingService {
+
+	@Autowired
+	private LocationDataRepository locationDataRepository;
+
+	@Autowired
+	private DeviceRepository deviceRepository;
+
+	@Autowired
+	private DeviceStatusRepository deviceStatusRepository;
+
+	@Autowired
+	private SimpMessagingTemplate messagingTemplate;
+
+	public LocationData updateLocation(LocationUpdateRequest request) {
+		Device device = deviceRepository.findByDeviceId(request.getDeviceId())
+				.orElseThrow(() -> new RuntimeException("Device not found"));
+
+		// Mark previous locations as not last known
+		locationDataRepository.updateLastKnownStatus(device.getId(), false);
+
+		LocationData locationData = new LocationData();
+		locationData.setDevice(device);
+		locationData.setLatitude(request.getLatitude());
+		locationData.setLongitude(request.getLongitude());
+		locationData.setAccuracy(request.getAccuracy());
+		locationData.setBatteryLevel(request.getBatteryLevel());
+		locationData.setIsCharging(request.getIsCharging());
+		locationData.setNetworkType(request.getNetworkType());
+		locationData.setIsLastKnown(true);
+		locationData.setTimestamp(LocalDateTime.now());
+
+		LocationData savedLocation = locationDataRepository.save(locationData);
+
+		// Update device last seen
+		device.setLastSeen(LocalDateTime.now());
+		deviceRepository.save(device);
+
+		// Send real-time update via WebSocket
+		messagingTemplate.convertAndSend("/topic/location/" + device.getDeviceId(), savedLocation);
+
+		return savedLocation;
+	}
+
+	public LocationData getCurrentLocation(String deviceId) {
+		Device device = deviceRepository.findByDeviceId(deviceId)
+				.orElseThrow(() -> new RuntimeException("Device not found"));
+
+		return locationDataRepository.findTopByDeviceIdOrderByTimestampDesc(device.getId()).orElse(null);
+	}
+
+	public List<LocationData> getLocationHistory(String deviceId, int hours) {
+		Device device = deviceRepository.findByDeviceId(deviceId)
+				.orElseThrow(() -> new RuntimeException("Device not found"));
+
+		LocalDateTime since = LocalDateTime.now().minusHours(hours);
+		return locationDataRepository.findByDeviceIdAndTimestampAfterOrderByTimestampDesc(device.getId(), since);
+	}
+
+	public List<Device> getUserDevices(Long userId) {
+		return deviceRepository.findByUserId(userId);
+	}
+
+	public void updateDeviceHeartbeat(String deviceId, Map<String, Object> data) {
+		Device device = deviceRepository.findByDeviceId(deviceId)
+				.orElseThrow(() -> new RuntimeException("Device not found"));
+
+		device.setLastSeen(LocalDateTime.now());
+		deviceRepository.save(device);
+
+		// Update or create device status
+		DeviceStatus status = deviceStatusRepository.findTopByDeviceIdOrderByCreatedAtDesc(device.getId())
+				.orElse(new DeviceStatus());
+
+		status.setDevice(device);
+		status.setBatteryLevel((Integer) data.get("batteryLevel"));
+		status.setLastHeartbeat(LocalDateTime.now());
+
+		if ((Integer) data.get("batteryLevel") < 20) {
+			status.setStatus(DeviceStatus.Status.LOW_BATTERY);
+		} else {
+			status.setStatus(DeviceStatus.Status.ONLINE);
+		}
+
+		deviceStatusRepository.save(status);
+	}
+
+	public TrackingResponse getDashboardData(Long userId) {
+		List<Device> devices = getUserDevices(userId);
+		TrackingResponse response = new TrackingResponse();
+
+		for (Device device : devices) {
+			DeviceTrackingInfo info = new DeviceTrackingInfo();
+			info.setDevice(device);
+			info.setCurrentLocation(getCurrentLocation(device.getDeviceId()));
+
+			// Check if device is online (last seen within 5 minutes)
+			LocalDateTime fiveMinutesAgo = LocalDateTime.now().minusMinutes(5);
+			info.setOnline(device.getLastSeen().isAfter(fiveMinutesAgo));
+
+			response.getDevices().add(info);
+		}
+
+		return response;
+	}
+
+	// Scheduled task to check for offline devices
+	@Scheduled(fixedRate = 60000) // Run every minute
+	public void checkOfflineDevices() {
+		LocalDateTime fiveMinutesAgo = LocalDateTime.now().minusMinutes(5);
+		List<Device> offlineDevices = deviceRepository.findByLastSeenBefore(fiveMinutesAgo);
+
+		for (Device device : offlineDevices) {
+			// Create alert for offline device
+			messagingTemplate.convertAndSend("/topic/alerts/" + device.getUser().getId(),
+					"Device " + device.getDeviceName() + " is offline");
+		}
+	}
+}

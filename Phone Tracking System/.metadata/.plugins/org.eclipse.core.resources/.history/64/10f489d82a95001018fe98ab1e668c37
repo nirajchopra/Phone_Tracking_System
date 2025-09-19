@@ -1,0 +1,5 @@
+package com.tracking.entityModels;
+
+public class Alert {
+
+}

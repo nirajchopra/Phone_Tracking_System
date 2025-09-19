@@ -1,0 +1,91 @@
+package com.tracking.entityModels;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "alerts")
+public class Alert {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@ManyToOne
+	@JoinColumn(name = "device_id")
+	private Device device;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "alert_type")
+	private AlertType alertType;
+
+	private String message;
+
+	@Column(name = "is_read")
+	private Boolean isRead = false;
+
+	@Column(name = "created_at")
+	private LocalDateTime createdAt = LocalDateTime.now();
+
+	public enum AlertType {
+		GEOFENCE_ENTRY, GEOFENCE_EXIT, LOW_BATTERY, DEVICE_OFFLINE, SOS
+	}
+
+	// Constructors
+	public Alert() {
+	}
+
+	public Alert(Device device, AlertType alertType, String message) {
+		this.device = device;
+		this.alertType = alertType;
+		this.message = message;
+	}
+
+	// Getters and Setters
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Device getDevice() {
+		return device;
+	}
+
+	public void setDevice(Device device) {
+		this.device = device;
+	}
+
+	public AlertType getAlertType() {
+		return alertType;
+	}
+
+	public void setAlertType(AlertType alertType) {
+		this.alertType = alertType;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public Boolean getIsRead() {
+		return isRead;
+	}
+
+	public void setIsRead(Boolean isRead) {
+		this.isRead = isRead;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+}

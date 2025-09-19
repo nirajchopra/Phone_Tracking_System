@@ -1,0 +1,84 @@
+package com.tracking.entity;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "device_status")
+public class DeviceStatus {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@ManyToOne
+	@JoinColumn(name = "device_id")
+	private Device device;
+
+	@Enumerated(EnumType.STRING)
+	private Status status = Status.ONLINE;
+
+	private Integer batteryLevel;
+
+	@Column(name = "last_heartbeat")
+	private LocalDateTime lastHeartbeat = LocalDateTime.now();
+
+	@Column(name = "created_at")
+	private LocalDateTime createdAt = LocalDateTime.now();
+
+	public enum Status {
+		ONLINE, OFFLINE, LOW_BATTERY, EMERGENCY
+	}
+
+	// Constructors
+	public DeviceStatus() {
+	}
+
+	// Getters and Setters
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Device getDevice() {
+		return device;
+	}
+
+	public void setDevice(Device device) {
+		this.device = device;
+	}
+
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
+	}
+
+	public Integer getBatteryLevel() {
+		return batteryLevel;
+	}
+
+	public void setBatteryLevel(Integer batteryLevel) {
+		this.batteryLevel = batteryLevel;
+	}
+
+	public LocalDateTime getLastHeartbeat() {
+		return lastHeartbeat;
+	}
+
+	public void setLastHeartbeat(LocalDateTime lastHeartbeat) {
+		this.lastHeartbeat = lastHeartbeat;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+}

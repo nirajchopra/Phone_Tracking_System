@@ -1,0 +1,13 @@
+package com.tracking.Phone_Tracking_System;
+
+/**
+ * Hello world!
+ *
+ */
+public class PhoneTrackingApplication 
+{
+    public static void main( String[] args )
+    {
+        System.out.println( "Hello World!" );
+    }
+}

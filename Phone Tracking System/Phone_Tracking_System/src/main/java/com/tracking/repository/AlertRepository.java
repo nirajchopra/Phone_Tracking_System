@@ -1,0 +1,23 @@
+package com.tracking.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import com.tracking.entity.Alert;
+
+@Repository
+public interface AlertRepository extends JpaRepository<Alert, Long> {
+	List<Alert> findByDeviceIdOrderByCreatedAtDesc(Long deviceId);
+
+	List<Alert> findByDeviceIdAndIsReadFalseOrderByCreatedAtDesc(Long deviceId);
+
+	@Query("SELECT a FROM Alert a WHERE a.device.user.id = :userId ORDER BY a.createdAt DESC")
+	List<Alert> findByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
+
+	@Query("SELECT a FROM Alert a WHERE a.device.user.id = :userId AND a.isRead = false ORDER BY a.createdAt DESC")
+	List<Alert> findUnreadByUserId(@Param("userId") Long userId);
+}
