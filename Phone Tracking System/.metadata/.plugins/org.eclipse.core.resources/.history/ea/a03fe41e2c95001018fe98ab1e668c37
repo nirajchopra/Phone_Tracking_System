@@ -1,5 +1,0 @@
-package com.tracking.config;
-
-public class WebSocketConfig {
-
-}
