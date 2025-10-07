@@ -3,6 +3,7 @@ package com.pts.util;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -23,6 +24,7 @@ public class AuthenticationFilter implements Filter {
         "/register",
         "/login.jsp",
         "/register.jsp",
+        "/dashboard.jsp",
         "/css/",
         "/js/",
         "/images/",
@@ -66,7 +68,7 @@ public class AuthenticationFilter implements Filter {
         } else {
             // User is not authenticated, redirect to login
             System.out.println("User not authenticated, redirecting to login");
-            httpResponse.sendRedirect(contextPath + "/login");
+            httpResponse.sendRedirect(contextPath + "/dashboard");
         }
     }
     
