@@ -34,6 +34,7 @@ public class User {
 	private String phoneNumber;
 
 	@Enumerated(EnumType.STRING)
+	@Column(name = "role")
 	private UserRole role = UserRole.USER;
 
 	@Column(name = "is_active")

@@ -3,7 +3,6 @@ package com.pts.util;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -24,6 +23,7 @@ public class AuthenticationFilter implements Filter {
         "/register",
         "/login.jsp",
         "/register.jsp",
+        "/dashboard",
         "/dashboard.jsp",
         "/css/",
         "/js/",
@@ -62,13 +62,22 @@ public class AuthenticationFilter implements Filter {
         HttpSession session = httpRequest.getSession(false);
         boolean isLoggedIn = (session != null && session.getAttribute("userId") != null);
         
+        System.out.println("Session exists: " + (session != null));
+        if (session != null) {
+            System.out.println("Session ID: " + session.getId());
+            System.out.println("userId in session: " + session.getAttribute("userId"));
+            System.out.println("username in session: " + session.getAttribute("username"));
+        }
+        System.out.println("Is Logged In: " + isLoggedIn);
+        
         if (isLoggedIn) {
             // User is authenticated, continue
             chain.doFilter(request, response);
+        	
         } else {
             // User is not authenticated, redirect to login
             System.out.println("User not authenticated, redirecting to login");
-            httpResponse.sendRedirect(contextPath + "/dashboard");
+            httpResponse.sendRedirect(contextPath + "/login");
         }
     }
     
