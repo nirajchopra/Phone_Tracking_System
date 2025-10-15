@@ -147,4 +147,11 @@ public class PhoneLocation {
 	public void setTrackedByUser(User trackedByUser) {
 		this.trackedByUser = trackedByUser;
 	}
+
+	public String getFormattedTrackedAt() {
+		if (trackedAt != null) {
+			return trackedAt.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+		}
+		return "";
+	}
 }

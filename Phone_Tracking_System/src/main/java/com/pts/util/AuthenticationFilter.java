@@ -25,6 +25,8 @@ public class AuthenticationFilter implements Filter {
         "/register.jsp",
         "/dashboard",
         "/dashboard.jsp",
+        "/profile",
+        "/profile.jsp",
         "/css/",
         "/js/",
         "/images/",

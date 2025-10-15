@@ -129,4 +129,54 @@ public class UserDAO {
 			return count > 0;
 		}
 	}
+	
+	// Update password only
+	public boolean updatePassword(Long userId, String newPassword) {
+		Transaction transaction = null;
+		System.out.println("[UPDATE PASSWORD UserDAO] Updating password for user ID: " + userId);
+		try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+			transaction = session.beginTransaction();
+			
+			User user = session.get(User.class, userId);
+			if (user != null) {
+				user.setPassword(newPassword);
+				session.update(user);
+				transaction.commit();
+				System.out.println("[UPDATE PASSWORD UserDAO] Password updated successfully");
+				return true;
+			}
+			
+			System.out.println("[UPDATE PASSWORD UserDAO] User not found");
+			return false;
+		} catch (Exception e) {
+			System.out.println("[UPDATE PASSWORD UserDAO] Error: " + e.getMessage());
+			if (transaction != null) {
+				transaction.rollback();
+			}
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	// Validate user credentials
+	public User validateUser(String username, String password) {
+		System.out.println("[VALIDATE USER UserDAO] Validating username: " + username);
+		try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+			Query<User> query = session.createQuery(
+				"FROM User WHERE username = :username AND password = :password", 
+				User.class
+			);
+			query.setParameter("username", username);
+			query.setParameter("password", password);
+			
+			User user = query.uniqueResult();
+			System.out.println("[VALIDATE USER UserDAO] Result: " + 
+				(user != null ? "Valid credentials" : "Invalid credentials"));
+			return user;
+		} catch (Exception e) {
+			System.out.println("[VALIDATE USER UserDAO] Error: " + e.getMessage());
+			e.printStackTrace();
+			return null;
+		}
+	}
 }

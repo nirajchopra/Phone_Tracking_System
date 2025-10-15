@@ -33,7 +33,7 @@
 						class="fas fa-user me-2"></i> ${user.fullName}
 					</a>
 					<ul class="dropdown-menu">
-						<li><a class="dropdown-item" href="#"><i
+						<li><a class="dropdown-item" href="profile"><i
 								class="fas fa-user-edit me-2"></i>Profile</a></li>
 						<li><a class="dropdown-item" href="#"><i
 								class="fas fa-cog me-2"></i>Settings</a></li>
@@ -187,35 +187,39 @@
 											</tr>
 										</thead>
 										<tbody>
-											<c:forEach items="${trackingHistory}" var="track"
-												varStatus="status">
-												<tr>
-													<td><c:choose>
-															<c:when test="${not empty track.phoneNumber}">
-																<i class="fas fa-phone text-primary me-2"></i>
-                                                                ${track.phoneNumber}
-                                                            </c:when>
-															<c:otherwise>
-																<i class="fas fa-envelope text-info me-2"></i>
-                                                                ${track.emailId}
-                                                            </c:otherwise>
-														</c:choose></td>
-													<td>${track.address}</td>
-													<td>${track.city}</td>
-													<td><small class="text-muted">
-															${track.latitude}, ${track.longitude} </small></td>
-													<td>${track.trackedAt.toString().replace('T', ' ').substring(0, 16).split('-')[2]}/${track.trackedAt.toString().split('-')[1]}/${track.trackedAt.toString().split('-')[0]}
-														${track.trackedAt.toString().split('T')[1].substring(0, 5)}
-													</td>
-													<td>
-														<button class="btn btn-sm btn-outline-primary"
-															onclick="showOnMap(${track.latitude}, ${track.longitude}, '${track.address}')">
-															<i class="fas fa-map me-1"></i>View
-														</button>
-													</td>
-												</tr>
-											</c:forEach>
-										</tbody>
+    <c:forEach items="${trackingHistory}" var="track" varStatus="status">
+        <tr>
+            <td>
+                <c:choose>
+                    <c:when test="${not empty track.phoneNumber}">
+                        <i class="fas fa-phone text-primary me-2"></i>
+                        ${track.phoneNumber}
+                    </c:when>
+                    <c:otherwise>
+                        <i class="fas fa-envelope text-info me-2"></i>
+                        ${track.emailId}
+                    </c:otherwise>
+                </c:choose>
+            </td>
+            <td>${track.address}</td>
+            <td>${track.city}</td>
+            <td>
+                <small class="text-muted">
+                    ${track.latitude}, ${track.longitude}
+                </small>
+            </td>
+            <td>
+                <small>${track.trackedAt}</small>
+            </td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary"
+                    onclick="showOnMap(${track.latitude}, ${track.longitude}, '${track.address}')">
+                    <i class="fas fa-map me-1"></i>View
+                </button>
+            </td>
+        </tr>
+    </c:forEach>
+</tbody>
 									</table>
 								</div>
 							</c:when>
