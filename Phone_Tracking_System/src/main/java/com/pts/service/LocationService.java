@@ -1,5 +1,6 @@
 package com.pts.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -16,116 +17,262 @@ public class LocationService {
 	private TrackingRequestDAO trackingRequestDAO;
 
 	public LocationService() {
-		this.locationDAO = new PhoneLocationDAO();
-		this.trackingRequestDAO = new TrackingRequestDAO();
+		try {
+			this.locationDAO = new PhoneLocationDAO();
+			this.trackingRequestDAO = new TrackingRequestDAO();
+			System.out.println("✓ LocationService initialized successfully");
+		} catch (Exception e) {
+			System.err.println("✗ Error initializing LocationService: " + e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 	public PhoneLocation trackByPhoneNumber(String phoneNumber, User user) {
+		System.out.println("→ trackByPhoneNumber called for: " + phoneNumber);
+
 		try {
+			// Validate phone number
 			if (!ValidationUtil.isValidPhoneNumber(phoneNumber)) {
-				throw new IllegalArgumentException("Invalid phone number format");
+				throw new IllegalArgumentException(
+						"Invalid phone number format. Please enter a valid 10-digit phone number.");
 			}
 
-			// Log the tracking request
+			// Create tracking request log
 			TrackingRequest request = new TrackingRequest(user, phoneNumber, SearchType.PHONE_NUMBER);
 
-			// Simulate location tracking (In real app, you would use actual APIs)
+			// Simulate location tracking
 			PhoneLocation location = simulateLocationTracking(phoneNumber, null);
-			location.setTrackedByUser(user);
 
 			if (location != null) {
-				locationDAO.saveLocation(location);
-				request.setSuccessful(true);
-				request.setResultMessage("Location found successfully");
+				// CRITICAL: Set user and timestamp
+				location.setTrackedByUser(user);
+				location.setTrackedAt(new Date()); // Set current timestamp
+
+				System.out.println("→ Saving location to database...");
+
+				// Save location to database
+				boolean saved = locationDAO.saveLocation(location);
+
+				if (saved) {
+					System.out.println("✓ Location saved successfully");
+					request.setSuccessful(true);
+					request.setResultMessage("Location found successfully");
+				} else {
+					System.err.println("✗ Failed to save location");
+					request.setSuccessful(false);
+					request.setResultMessage("Failed to save location");
+				}
 			} else {
+				System.err.println("✗ Location tracking failed");
 				request.setSuccessful(false);
 				request.setResultMessage("Location not found");
 			}
 
-			trackingRequestDAO.saveRequest(request);
+			// Save tracking request
+			try {
+				trackingRequestDAO.saveRequest(request);
+			} catch (Exception e) {
+				System.err.println("⚠ Warning: Could not save tracking request: " + e.getMessage());
+			}
+
 			return location;
 
+		} catch (IllegalArgumentException e) {
+			System.err.println("✗ Validation error: " + e.getMessage());
+			throw e;
 		} catch (Exception e) {
-			System.err.println("Error tracking phone number: " + e.getMessage());
+			System.err.println("✗ Error tracking phone number: " + e.getMessage());
+			e.printStackTrace();
 			return null;
 		}
 	}
 
 	public PhoneLocation trackByEmailId(String emailId, User user) {
+		System.out.println("→ trackByEmailId called for: " + emailId);
+
 		try {
+			// Validate email
 			if (!ValidationUtil.isValidEmail(emailId)) {
-				throw new IllegalArgumentException("Invalid email format");
+				throw new IllegalArgumentException("Invalid email format. Please enter a valid email address.");
 			}
 
-			// Log the tracking request
+			// Create tracking request log
 			TrackingRequest request = new TrackingRequest(user, emailId, SearchType.EMAIL_ID);
 
 			// Simulate location tracking
 			PhoneLocation location = simulateLocationTracking(null, emailId);
-			location.setTrackedByUser(user);
 
 			if (location != null) {
-				locationDAO.saveLocation(location);
-				request.setSuccessful(true);
-				request.setResultMessage("Location found successfully");
+				// CRITICAL: Set user and timestamp
+				location.setTrackedByUser(user);
+				location.setTrackedAt(new Date()); // Set current timestamp
+
+				System.out.println("→ Saving location to database...");
+
+				// Save location to database
+				boolean saved = locationDAO.saveLocation(location);
+
+				if (saved) {
+					System.out.println("✓ Location saved successfully");
+					request.setSuccessful(true);
+					request.setResultMessage("Location found successfully");
+				} else {
+					System.err.println("✗ Failed to save location");
+					request.setSuccessful(false);
+					request.setResultMessage("Failed to save location");
+				}
 			} else {
+				System.err.println("✗ Location tracking failed");
 				request.setSuccessful(false);
 				request.setResultMessage("Location not found");
 			}
 
-			trackingRequestDAO.saveRequest(request);
+			// Save tracking request
+			try {
+				trackingRequestDAO.saveRequest(request);
+			} catch (Exception e) {
+				System.err.println("⚠ Warning: Could not save tracking request: " + e.getMessage());
+			}
+
 			return location;
 
+		} catch (IllegalArgumentException e) {
+			System.err.println("✗ Validation error: " + e.getMessage());
+			throw e;
 		} catch (Exception e) {
-			System.err.println("Error tracking email ID: " + e.getMessage());
+			System.err.println("✗ Error tracking email ID: " + e.getMessage());
+			e.printStackTrace();
 			return null;
 		}
 	}
 
+	/**
+	 * Simulate location tracking with realistic data TODO: Replace with real API
+	 * integration (Google Geolocation, Twilio, etc.)
+	 */
 	private PhoneLocation simulateLocationTracking(String phoneNumber, String emailId) {
-		// This is a simulation. In a real application, you would integrate with:
-		// - Telecom APIs for phone number location
-		// - Social media APIs for email-based location
-		// - IP geolocation services
-		// - Mobile network operator APIs
+		System.out.println("→ Simulating location tracking...");
 
-		Random random = new Random();
-		String[] cities = { "Mumbai", "Delhi", "Bangalore", "Chennai", "Kolkata", "Hyderabad", "Pune", "Ahmedabad" };
-		String[] countries = { "India", "USA", "UK", "Canada", "Australia" };
+		try {
+			Random random = new Random();
 
-		double[] latitudes = { 19.0760, 28.7041, 12.9716, 13.0827, 22.5726, 17.3850, 18.5204, 23.0225 };
-		double[] longitudes = { 72.8777, 77.1025, 77.5946, 80.2707, 88.3639, 78.4867, 73.8567, 72.5714 };
+			// Indian cities with accurate coordinates
+			String[] cities = { "Mumbai", "Delhi", "Bangalore", "Chennai", "Kolkata", "Hyderabad", "Pune", "Ahmedabad",
+					"Jaipur", "Lucknow", "Kanpur", "Nagpur" };
 
-		int index = random.nextInt(cities.length);
+			String[] states = { "Maharashtra", "Delhi", "Karnataka", "Tamil Nadu", "West Bengal", "Telangana",
+					"Maharashtra", "Gujarat", "Rajasthan", "Uttar Pradesh", "Uttar Pradesh", "Maharashtra" };
 
-		PhoneLocation location = new PhoneLocation();
-		location.setPhoneNumber(phoneNumber);
-		location.setEmailId(emailId);
-		location.setLatitude(latitudes[index] + (random.nextDouble() - 0.5) * 0.01); // Add some randomness
-		location.setLongitude(longitudes[index] + (random.nextDouble() - 0.5) * 0.01);
-		location.setCity(cities[index]);
-		location.setCountry("India");
-		location.setAddress(generateRandomAddress(cities[index]));
-		location.setAccuracy("High");
+			// Accurate coordinates for each city
+			double[] latitudes = { 19.0760, 28.7041, 12.9716, 13.0827, 22.5726, 17.3850, 18.5204, 23.0225, 26.9124,
+					26.8467, 26.4499, 21.1458 };
 
-		return location;
+			double[] longitudes = { 72.8777, 77.1025, 77.5946, 80.2707, 88.3639, 78.4867, 73.8567, 72.5714, 75.7873,
+					80.9462, 80.3319, 79.0882 };
+
+			// Random city selection
+			int index = random.nextInt(cities.length);
+
+			// Create location object
+			PhoneLocation location = new PhoneLocation();
+
+			// Set query info
+			location.setPhoneNumber(phoneNumber);
+			location.setEmailId(emailId);
+
+			// Set location details
+			location.setCity(cities[index]);
+			location.setState(states[index]);
+			location.setCountry("India");
+			location.setAddress(generateRandomAddress(cities[index]));
+
+			// Set coordinates with slight randomness for realism
+			location.setLatitude(latitudes[index] + (random.nextDouble() - 0.5) * 0.01);
+			location.setLongitude(longitudes[index] + (random.nextDouble() - 0.5) * 0.01);
+
+			// Set accuracy
+			location.setAccuracy("High");
+
+			// CRITICAL: Set tracked time
+			location.setTrackedAt(new Date());
+
+			System.out.println("✓ Location simulated: " + cities[index] + ", " + states[index]);
+
+			return location;
+
+		} catch (Exception e) {
+			System.err.println("✗ Error simulating location: " + e.getMessage());
+			e.printStackTrace();
+			return null;
+		}
 	}
 
+	/**
+	 * Generate realistic random address
+	 */
 	private String generateRandomAddress(String city) {
-		String[] areas = { "MG Road", "Park Street", "Civil Lines", "Sector 14", "Koramangala", "Banjara Hills" };
+		String[] areas = { "MG Road", "Park Street", "Civil Lines", "Sector 14", "Koramangala", "Banjara Hills",
+				"Connaught Place", "Brigade Road", "Jubilee Hills", "Indiranagar", "Whitefield", "Viman Nagar" };
+
+		String[] landmarks = { "Near City Mall", "Opposite Metro Station", "Behind Bus Stand", "Near Railway Station",
+				"Close to Airport", "Near Hospital" };
+
 		Random random = new Random();
-		return (random.nextInt(999) + 1) + ", " + areas[random.nextInt(areas.length)] + ", " + city;
+		int houseNo = random.nextInt(999) + 1;
+		String area = areas[random.nextInt(areas.length)];
+		String landmark = landmarks[random.nextInt(landmarks.length)];
+
+		return houseNo + ", " + area + ", " + landmark + ", " + city;
 	}
 
+	/**
+	 * Get location history for a user
+	 */
 	public List<PhoneLocation> getLocationHistory(User user) {
-		return locationDAO.findByUser(user);
+		try {
+			System.out.println("→ Fetching location history for user: " + user.getUsername());
+			List<PhoneLocation> history = locationDAO.findByUser(user);
+
+			// Ensure all locations have valid trackedAt dates
+			if (history != null) {
+				for (PhoneLocation loc : history) {
+					if (loc.getTrackedAt() == null) {
+						loc.setTrackedAt(new Date());
+					}
+				}
+			}
+
+			System.out.println("✓ Found " + (history != null ? history.size() : 0) + " location records");
+			return history;
+
+		} catch (Exception e) {
+			System.err.println("✗ Error fetching location history: " + e.getMessage());
+			e.printStackTrace();
+			return null;
+		}
 	}
 
+	/**
+	 * Get locations by phone number
+	 */
 	public List<PhoneLocation> getLocationsByPhoneNumber(String phoneNumber) {
-		return locationDAO.findByPhoneNumber(phoneNumber);
+		try {
+			return locationDAO.findByPhoneNumber(phoneNumber);
+		} catch (Exception e) {
+			System.err.println("✗ Error fetching locations by phone: " + e.getMessage());
+			return null;
+		}
 	}
 
+	/**
+	 * Get locations by email ID
+	 */
 	public List<PhoneLocation> getLocationsByEmailId(String emailId) {
-		return locationDAO.findByEmailId(emailId);
+		try {
+			return locationDAO.findByEmailId(emailId);
+		} catch (Exception e) {
+			System.err.println("✗ Error fetching locations by email: " + e.getMessage());
+			return null;
+		}
 	}
 }

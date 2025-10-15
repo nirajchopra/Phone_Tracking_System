@@ -1,157 +1,228 @@
 package com.pts.model;
 
-import java.time.LocalDateTime;
+import java.io.Serializable;
+import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "phone_locations")
-public class PhoneLocation {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+public class PhoneLocation implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+    
+    @Column(name = "phone_number", length = 20, nullable = true)
+    private String phoneNumber;
+    
+    @Column(name = "email_id", length = 100, nullable = true)
+    private String emailId;
+    
+    @Column(name = "latitude", nullable = false)
+    private double latitude;
+    
+    @Column(name = "longitude", nullable = false)
+    private double longitude;
+    
+    @Column(name = "city", length = 100)
+    private String city;
+    
+    @Column(name = "state", length = 100)
+    private String state;
+    
+    @Column(name = "country", length = 100)
+    private String country;
+    
+    @Column(name = "address", columnDefinition = "TEXT")
+    private String address;
+    
+    @Column(name = "accuracy", length = 50)
+    private String accuracy;
+    
+    // CRITICAL: Temporal annotation for Date field with default value
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "tracked_at", nullable = false, updatable = false)
+    private Date trackedAt;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "tracked_by_user_id")
+    private User trackedByUser;
+    
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at", updatable = false)
+    private Date createdAt;
 
-	@Column(name = "phone_number", nullable = false)
-	private String phoneNumber;
+    // Default Constructor - ALWAYS initialize trackedAt
+    public PhoneLocation() {
+        this.trackedAt = new Date();
+        this.createdAt = new Date();
+    }
 
-	@Column(name = "email_id")
-	private String emailId;
+    // Full Constructor
+    public PhoneLocation(String phoneNumber, String emailId, double latitude, double longitude,
+                        String city, String state, String country, String address, 
+                        String accuracy, User trackedByUser) {
+        this.phoneNumber = phoneNumber;
+        this.emailId = emailId;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.city = city;
+        this.state = state;
+        this.country = country;
+        this.address = address;
+        this.accuracy = accuracy;
+        this.trackedByUser = trackedByUser;
+        this.trackedAt = new Date();
+        this.createdAt = new Date();
+    }
 
-	@Column(nullable = false)
-	private double latitude;
+    // PrePersist hook to ensure dates are set before saving
+    @PrePersist
+    protected void onCreate() {
+        if (this.trackedAt == null) {
+            this.trackedAt = new Date();
+        }
+        if (this.createdAt == null) {
+            this.createdAt = new Date();
+        }
+    }
 
-	@Column(nullable = false)
-	private double longitude;
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
 
-	@Column(name = "address")
-	private String address;
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	@Column(name = "city")
-	private String city;
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
 
-	@Column(name = "country")
-	private String country;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
-	@Column(name = "accuracy")
-	private String accuracy;
+    public String getEmailId() {
+        return emailId;
+    }
 
-	@Column(name = "tracked_at")
-	private LocalDateTime trackedAt = LocalDateTime.now();
+    public void setEmailId(String emailId) {
+        this.emailId = emailId;
+    }
 
-	@ManyToOne
-	@JoinColumn(name = "tracked_by_user_id")
-	private User trackedByUser;
+    public double getLatitude() {
+        return latitude;
+    }
 
-	// Constructors
-	public PhoneLocation() {
-	}
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
 
-	public PhoneLocation(String phoneNumber, double latitude, double longitude) {
-		this.phoneNumber = phoneNumber;
-		this.latitude = latitude;
-		this.longitude = longitude;
-	}
+    public double getLongitude() {
+        return longitude;
+    }
 
-	// Getters and Setters
-	public Long getId() {
-		return id;
-	}
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public String getCity() {
+        return city;
+    }
 
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
+    public void setCity(String city) {
+        this.city = city;
+    }
 
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
+    public String getState() {
+        return state;
+    }
 
-	public String getEmailId() {
-		return emailId;
-	}
+    public void setState(String state) {
+        this.state = state;
+    }
 
-	public void setEmailId(String emailId) {
-		this.emailId = emailId;
-	}
+    public String getCountry() {
+        return country;
+    }
 
-	public double getLatitude() {
-		return latitude;
-	}
+    public void setCountry(String country) {
+        this.country = country;
+    }
 
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
+    public String getAddress() {
+        return address;
+    }
 
-	public double getLongitude() {
-		return longitude;
-	}
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-	}
+    public String getAccuracy() {
+        return accuracy;
+    }
 
-	public String getAddress() {
-		return address;
-	}
+    public void setAccuracy(String accuracy) {
+        this.accuracy = accuracy;
+    }
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
+    /**
+     * CRITICAL: Null-safe getter for trackedAt
+     * Always returns a valid Date object
+     */
+    public Date getTrackedAt() {
+        if (this.trackedAt == null) {
+            this.trackedAt = new Date();
+        }
+        return this.trackedAt;
+    }
 
-	public String getCity() {
-		return city;
-	}
+    /**
+     * CRITICAL: Null-safe setter for trackedAt
+     * Prevents null values from being set
+     */
+    public void setTrackedAt(Date trackedAt) {
+        this.trackedAt = (trackedAt != null) ? trackedAt : new Date();
+    }
 
-	public void setCity(String city) {
-		this.city = city;
-	}
+    public User getTrackedByUser() {
+        return trackedByUser;
+    }
 
-	public String getCountry() {
-		return country;
-	}
+    public void setTrackedByUser(User trackedByUser) {
+        this.trackedByUser = trackedByUser;
+    }
 
-	public void setCountry(String country) {
-		this.country = country;
-	}
+    public Date getCreatedAt() {
+        if (this.createdAt == null) {
+            this.createdAt = new Date();
+        }
+        return createdAt;
+    }
 
-	public String getAccuracy() {
-		return accuracy;
-	}
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = (createdAt != null) ? createdAt : new Date();
+    }
 
-	public void setAccuracy(String accuracy) {
-		this.accuracy = accuracy;
-	}
-
-	public LocalDateTime getTrackedAt() {
-		return trackedAt;
-	}
-
-	public void setTrackedAt(LocalDateTime trackedAt) {
-		this.trackedAt = trackedAt;
-	}
-
-	public User getTrackedByUser() {
-		return trackedByUser;
-	}
-
-	public void setTrackedByUser(User trackedByUser) {
-		this.trackedByUser = trackedByUser;
-	}
-
-	public String getFormattedTrackedAt() {
-		if (trackedAt != null) {
-			return trackedAt.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
-		}
-		return "";
-	}
+    @Override
+    public String toString() {
+        return "PhoneLocation{" +
+                "id=" + id +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", emailId='" + emailId + '\'' +
+                ", city='" + city + '\'' +
+                ", state='" + state + '\'' +
+                ", country='" + country + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", accuracy='" + accuracy + '\'' +
+                ", trackedAt=" + trackedAt +
+                ", trackedByUser=" + (trackedByUser != null ? trackedByUser.getUsername() : "null") +
+                '}';
+    }
 }

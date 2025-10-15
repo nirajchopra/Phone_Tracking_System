@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <!DOCTYPE html>
@@ -8,38 +7,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard - Phone Tracking System</title>
-<link
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-	rel="stylesheet">
-<link
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-	rel="stylesheet">
-<link rel="stylesheet"
-	href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
 <link href="css/dashboard.css" rel="stylesheet">
 </head>
 <body>
 	<!-- Navigation -->
 	<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
 		<div class="container">
-			<a class="navbar-brand" href="#"> <i
-				class="fas fa-map-marker-alt me-2"></i> PhoneTracker Pro
+			<a class="navbar-brand" href="#">
+				<i class="fas fa-map-marker-alt me-2"></i> PhoneTracker Pro
 			</a>
-
 			<div class="navbar-nav ms-auto">
 				<div class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
-						role="button" data-bs-toggle="dropdown"> <i
-						class="fas fa-user me-2"></i> ${user.fullName}
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+						<i class="fas fa-user me-2"></i> ${user.fullName}
 					</a>
 					<ul class="dropdown-menu">
-						<li><a class="dropdown-item" href="profile"><i
-								class="fas fa-user-edit me-2"></i>Profile</a></li>
-						<li><a class="dropdown-item" href="#"><i
-								class="fas fa-cog me-2"></i>Settings</a></li>
+						<li><a class="dropdown-item" href="profile"><i class="fas fa-user-edit me-2"></i>Profile</a></li>
+						<li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
 						<li><hr class="dropdown-divider"></li>
-						<li><a class="dropdown-item" href="logout"><i
-								class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+						<li><a class="dropdown-item" href="logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
 					</ul>
 				</div>
 			</div>
@@ -69,8 +58,7 @@
 				<h1 class="display-6 mb-3">
 					<i class="fas fa-tachometer-alt me-2"></i> Dashboard
 				</h1>
-				<p class="text-muted">Track phone numbers and email IDs with
-					precise location data</p>
+				<p class="text-muted">Track phone numbers and email IDs with precise location data</p>
 			</div>
 		</div>
 
@@ -87,16 +75,12 @@
 						<form method="post" action="track-location" id="trackForm">
 							<div class="row g-3">
 								<div class="col-md-6">
-									<label for="searchQuery" class="form-label">Phone
-										Number / Email ID</label> <input type="text"
-										class="form-control form-control-lg" id="searchQuery"
-										name="searchQuery" placeholder="Enter phone number or email"
-										required>
+									<label for="searchQuery" class="form-label">Phone Number / Email ID</label>
+									<input type="text" class="form-control form-control-lg" id="searchQuery" name="searchQuery" placeholder="Enter phone number or email" required>
 								</div>
 								<div class="col-md-3">
 									<label for="searchType" class="form-label">Search Type</label>
-									<select class="form-select form-select-lg" id="searchType"
-										name="searchType">
+									<select class="form-select form-select-lg" id="searchType" name="searchType">
 										<option value="phone">Phone Number</option>
 										<option value="email">Email ID</option>
 									</select>
@@ -128,26 +112,21 @@
 								<div class="col-md-6">
 									<h6 class="text-muted">Location Details</h6>
 									<div class="location-details">
-										<p>
-											<strong>Address:</strong> ${location.address}
-										</p>
-										<p>
-											<strong>City:</strong> ${location.city}
-										</p>
-										<p>
-											<strong>Country:</strong> ${location.country}
-										</p>
-										<p>
-											<strong>Coordinates:</strong> ${location.latitude},
-											${location.longitude}
-										</p>
-										<p>
-											<strong>Accuracy:</strong> <span class="badge bg-success">${location.accuracy}</span>
-										</p>
+										<p><strong>Address:</strong> ${location.address}</p>
+										<p><strong>City:</strong> ${location.city}</p>
+										<p><strong>Country:</strong> ${location.country}</p>
+										<p><strong>Coordinates:</strong> ${location.latitude}, ${location.longitude}</p>
+										<p><strong>Accuracy:</strong> <span class="badge bg-success">${location.accuracy}</span></p>
 										<p>
 											<strong>Tracked At:</strong>
-											<fmt:formatDate value="${location.trackedAt}"
-												pattern="yyyy-MM-dd HH:mm:ss" />
+											<c:choose>
+												<c:when test="${not empty location.trackedAt}">
+													<fmt:formatDate value="${location.trackedAt}" pattern="yyyy-MM-dd HH:mm:ss" />
+												</c:when>
+												<c:otherwise>
+													N/A
+												</c:otherwise>
+											</c:choose>
 										</p>
 									</div>
 								</div>
@@ -187,39 +166,41 @@
 											</tr>
 										</thead>
 										<tbody>
-    <c:forEach items="${trackingHistory}" var="track" varStatus="status">
-        <tr>
-            <td>
-                <c:choose>
-                    <c:when test="${not empty track.phoneNumber}">
-                        <i class="fas fa-phone text-primary me-2"></i>
-                        ${track.phoneNumber}
-                    </c:when>
-                    <c:otherwise>
-                        <i class="fas fa-envelope text-info me-2"></i>
-                        ${track.emailId}
-                    </c:otherwise>
-                </c:choose>
-            </td>
-            <td>${track.address}</td>
-            <td>${track.city}</td>
-            <td>
-                <small class="text-muted">
-                    ${track.latitude}, ${track.longitude}
-                </small>
-            </td>
-            <td>
-                <small>${track.trackedAt}</small>
-            </td>
-            <td>
-                <button class="btn btn-sm btn-outline-primary"
-                    onclick="showOnMap(${track.latitude}, ${track.longitude}, '${track.address}')">
-                    <i class="fas fa-map me-1"></i>View
-                </button>
-            </td>
-        </tr>
-    </c:forEach>
-</tbody>
+											<c:forEach items="${trackingHistory}" var="track" varStatus="status">
+												<tr>
+													<td>
+														<c:choose>
+															<c:when test="${not empty track.phoneNumber}">
+																<i class="fas fa-phone text-primary me-2"></i>${track.phoneNumber}
+															</c:when>
+															<c:otherwise>
+																<i class="fas fa-envelope text-info me-2"></i>${track.emailId}
+															</c:otherwise>
+														</c:choose>
+													</td>
+													<td>${track.address}</td>
+													<td>${track.city}</td>
+													<td><small class="text-muted">${track.latitude}, ${track.longitude}</small></td>
+													<td>
+														<small>
+															<c:choose>
+																<c:when test="${not empty track.trackedAt}">
+																	<fmt:formatDate value="${track.trackedAt}" pattern="yyyy-MM-dd HH:mm:ss" />
+																</c:when>
+																<c:otherwise>
+																	N/A
+																</c:otherwise>
+															</c:choose>
+														</small>
+													</td>
+													<td>
+														<button class="btn btn-sm btn-outline-primary" onclick="showOnMap(${track.latitude}, ${track.longitude}, '${track.address}')">
+															<i class="fas fa-map me-1"></i>View
+														</button>
+													</td>
+												</tr>
+											</c:forEach>
+										</tbody>
 									</table>
 								</div>
 							</c:when>
@@ -227,8 +208,7 @@
 								<div class="text-center py-5">
 									<i class="fas fa-search fa-3x text-muted mb-3"></i>
 									<h5 class="text-muted">No tracking history yet</h5>
-									<p class="text-muted">Start tracking phone numbers or email
-										IDs to see your history here.</p>
+									<p class="text-muted">Start tracking phone numbers or email IDs to see your history here.</p>
 								</div>
 							</c:otherwise>
 						</c:choose>
@@ -259,14 +239,12 @@
 		</div>
 	</div>
 
-	<script
-		src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 	<script src="js/dashboard.js"></script>
 
 	<c:if test="${not empty location}">
 		<script>
-            // Initialize map with current location
             document.addEventListener('DOMContentLoaded', function() {
                 initializeMap('${location.latitude}', '${location.longitude}', '${location.address}');
             });
